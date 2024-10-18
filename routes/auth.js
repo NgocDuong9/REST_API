@@ -14,11 +14,13 @@ router.post("/register", async (req, res) => {
       email: req.body.email,
       password: hashedPassword,
     });
+
     //send user and respond
     const user = await newUser.save();
     res.status(200).json(user);
   } catch (error) {
     console.log(error);
+    res.status(400).json(error);
   }
   //   await user.save();
 });
