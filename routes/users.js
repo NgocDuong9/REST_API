@@ -41,7 +41,9 @@ router.delete("/:id", async (req, res) => {
 //get a user
 router.get("/:id", async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id)
+      .populate("followings", "username email profilePicture")
+      .populate("followers", "username email profilePicture");
     const { password, updateedAt, ...other } = user._doc;
     res.status(200).json(other);
   } catch (error) {

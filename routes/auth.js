@@ -34,7 +34,9 @@ router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({
       email: req.body.email,
-    });
+    })
+      .populate("followings", "username email")
+      .populate("followers", "username email");
     if (!user) {
       res.status(404).json({ message: "user not found" });
       return;
