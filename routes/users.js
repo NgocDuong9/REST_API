@@ -58,6 +58,19 @@ router.get("/", async (req, res) => {
     return res.status(500).json(error);
   }
 });
+
+//get friend
+router.get("/friends/:id", async (req, res) => {
+  try {
+    const firend = await User.findById(req.params.id)
+      .populate("followings", "username email")
+      .populate("followers", "username email");
+    res.status(200).json(firend);
+  } catch (error) {
+    res.status(403).json(error);
+  }
+});
+
 //follow a user
 router.put("/follow/:id", async (req, res) => {
   if (req.body.userId !== req.params.id) {

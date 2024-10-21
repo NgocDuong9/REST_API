@@ -5,7 +5,9 @@ const User = require("../modules/User");
 // create a post
 router.post("/", async (req, res) => {
   const user = await User.findById(req.body.userId);
-  !user && res.status(400).json("user not found");
+  if (!user) {
+    return res.status(400).json("user not found");
+  }
   try {
     const newPost = new Post({ ...req.body, user });
     const post = await newPost.save();
