@@ -7,7 +7,7 @@ router.post("/", async (req, res) => {
   const user = await User.findById(req.body.userId);
   !user && res.status(400).json("user not found");
   try {
-    const newPost = new Post(req.body);
+    const newPost = new Post({ ...req.body, user });
     const post = await newPost.save();
     res.status(200).json(post);
   } catch (error) {
@@ -84,16 +84,24 @@ router.get("/", async (req, res) => {
 });
 
 // get timline posts
-router.get("/timeline/all", async (req, res) => {
+router.get("/timeline/all/:id", async (req, res) => {
   try {
-    const currentUser = await User.findById(req.body.userId);
+    const currentUser = await User.findById(req.params.id);
 
-    const userPost = await Post.find({ userId: currentUser._id });
-    const friendPost = await Promise.all(
-      currentUser.followings.map((friend) => Post.find({ userId: friend }))
+    const userPost = await Post.find({ user: currentUser._id }).populate(
+      "user"
     );
-    res.status(200).json(userPost.concat(...friendPost));
+    const friendPost = await Promise.all(
+      currentUser.followings.map((friend) => Post.find({ user: friend }))
+    );
+    const allPosts = userPost.concat(...friendPost);
+
+    allPosts.sort((a, b) => b.createdAt - a.createdAt);
+
+    res.status(200).json(allPosts);
   } catch (error) {
+    console.log({ error });
+
     res.status(500).json(error);
   }
 });

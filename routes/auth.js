@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 
 //REGISTER
 router.post("/register", async (req, res) => {
+  console.log(req.body);
+
   try {
     //generate new password
     const salt = await bcrypt.genSalt(10);
@@ -19,6 +21,8 @@ router.post("/register", async (req, res) => {
     const user = await newUser.save();
     res.status(200).json(user);
   } catch (error) {
+    // throw new Error(error);
+
     console.log(error);
     res.status(400).json(error);
   }
@@ -31,16 +35,17 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({
       email: req.body.email,
     });
-    !user && res.status(404).send("user not found");
+    !user && res.status(404).json({ message: "user not found" });
 
     const validPassword = await bcrypt.compare(
       req.body.password,
       user.password
     );
-    !validPassword && res.status(404).send("password wrong");
+    !validPassword && res.status(404).json({ message: "password wrong" });
 
     res.status(200).send(user);
   } catch (error) {
+    // throw new Error(error);
     res.status(500).json(error);
   }
 });
