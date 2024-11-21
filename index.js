@@ -10,6 +10,8 @@ const cors = require("cors"); // Thêm cors
 const userRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 const postRouter = require("./routes/post");
+const messageRouter = require("./routes/message");
+const conversationRouter = require("./routes/conversation");
 
 const multer = require("multer");
 const path = require("path");
@@ -20,13 +22,14 @@ dotenv.config();
 //connect db
 mongoose.connect(process.env.MONGO_URL);
 
-app.use("/images", express.static(path.join(__dirname, "public/images")));
-
 //middleware
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
 app.use(cors());
+
+//uploadImage
+app.use("/images", express.static(path.join(__dirname, "public/images")));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -57,6 +60,8 @@ app.get("/", (req, res) => {
 app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/post", postRouter);
+app.use("/api/message", messageRouter);
+app.use("/api/conversation", conversationRouter);
 
 app.listen(8800, () => {
   console.log("Backend running@@@!");
